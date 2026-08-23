@@ -56,6 +56,7 @@
       text-transform: uppercase;
     }
 
+    .entry-gate,
     .broadcast-intro {
       position: fixed;
       inset: 0;
@@ -66,6 +67,24 @@
       color: var(--cream);
       background: var(--red);
       text-align: center;
+    }
+
+    .entry-gate {
+      display: grid;
+      background: var(--ink);
+    }
+
+    .entry-gate h2 {
+      margin-bottom: 1rem;
+      color: var(--gold);
+      font-size: clamp(3rem, 10vw, 7rem);
+    }
+
+    .entry-gate p {
+      max-width: 500px;
+      margin: 0 auto 1.8rem;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.2rem;
     }
 
     .broadcast-intro.show { display: grid; }
@@ -103,24 +122,8 @@
       width: 0;
       height: 100%;
       background: var(--gold);
-      animation: broadcast-load 8s linear forwards;
+      animation: broadcast-load 5s linear forwards;
     }
-
-    .siren-button {
-      display: none;
-      margin: 1.25rem auto 0;
-      padding: .65rem .9rem;
-      color: var(--ink);
-      background: var(--gold);
-      border: 3px solid var(--ink);
-      box-shadow: 4px 4px 0 var(--ink);
-      font: inherit;
-      font-weight: 1000;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-
-    .siren-button.show { display: block; }
 
     @keyframes broadcast-pulse { to { transform: scale(1.1) rotate(4deg); } }
     @keyframes broadcast-load { to { width: 100%; } }
@@ -129,7 +132,7 @@
       position: fixed;
       left: 0;
       top: 0;
-      z-index: 999;
+      z-index: 1100;
       width: auto;
       height: auto;
       pointer-events: none;
@@ -505,13 +508,21 @@
   </style>
 </head>
 <body>
+  <div class="entry-gate" id="entryGate" role="dialog" aria-modal="true" aria-labelledby="entry-title">
+    <div>
+      <p class="stamp">Restricted transmission</p>
+      <h2 id="entry-title">Are you ready?</h2>
+      <p>Click below to enter with full state-approved sound.</p>
+      <button class="button" id="beginButton" type="button">Begin transmission</button>
+    </div>
+  </div>
+
   <div class="broadcast-intro" id="broadcastIntro" aria-live="polite">
     <div>
       <div class="broadcast-star" aria-hidden="true">★</div>
       <h2>Emergency broadcast</h2>
       <p>Official transmission incoming</p>
       <div class="broadcast-loader" aria-hidden="true"></div>
-      <button class="siren-button" id="sirenButton" type="button">Enable siren</button>
     </div>
   </div>
 
@@ -661,26 +672,24 @@
   </audio>
 
   <script>
+    const entryGate = document.querySelector('#entryGate');
+    const beginButton = document.querySelector('#beginButton');
     const broadcastIntro = document.querySelector('#broadcastIntro');
     const alarmSound = document.querySelector('#alarmSound');
-    const sirenButton = document.querySelector('#sirenButton');
-    broadcastIntro.classList.add('show');
     alarmSound.volume = 0.55;
 
-    alarmSound.play().catch(() => {
-      sirenButton.classList.add('show');
-    });
-
-    sirenButton.addEventListener('click', () => {
-      alarmSound.play();
-      sirenButton.classList.remove('show');
-    });
-
-    setTimeout(() => {
-      broadcastIntro.classList.remove('show');
-      alarmSound.pause();
+    beginButton.addEventListener('click', () => {
+      entryGate.style.display = 'none';
+      broadcastIntro.classList.add('show');
       alarmSound.currentTime = 0;
-    }, 8000);
+      alarmSound.play();
+
+      setTimeout(() => {
+        broadcastIntro.classList.remove('show');
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+      }, 5000);
+    });
 
     const cursorTarget = document.querySelector('#cursorTarget');
     document.addEventListener('pointermove', event => {
