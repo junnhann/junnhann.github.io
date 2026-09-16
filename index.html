@@ -62,8 +62,55 @@
         <span class="pray-emoji" style="--i:7;">🙏</span>
     </section>
 
+
     <footer>
         <p>&copy; 2026 Saw Jun Han. All rights reserved.</p>
+        <button id="chaos-toggle" type="button">🌀 Toggle image chaos</button>
     </footer>
+
+    <script>
+        (function () {
+            var timerId = null;
+            var frame = 0;
+            var button = document.getElementById('chaos-toggle');
+
+            function tick() {
+                var images = document.getElementsByTagName('img');
+                for (var i = 0; i < images.length; i++) {
+                    var style = images[i].style;
+                    style.position = 'fixed';
+                    style.left = (Math.sin(frame * 0.1 + i * 0.25 + 1.6) * 300 + 300) + 'px';
+                    style.top = (Math.cos(frame * 0.05 + i * 0.24 + 0.24) * 200 + 200) + 'px';
+                }
+                frame++;
+            }
+
+            function stop() {
+                clearInterval(timerId);
+                timerId = null;
+                var images = document.getElementsByTagName('img');
+                for (var i = 0; i < images.length; i++) {
+                    images[i].style.position = '';
+                    images[i].style.left = '';
+                    images[i].style.top = '';
+                }
+                button.textContent = '🌀 Toggle image chaos';
+            }
+
+            function start() {
+                frame = 0;
+                timerId = setInterval(tick, 30);
+                button.textContent = '🛑 Stop image chaos';
+            }
+
+            button.addEventListener('click', function () {
+                if (timerId) {
+                    stop();
+                } else {
+                    start();
+                }
+            });
+        })();
+    </script>
 
 </body>
